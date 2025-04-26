@@ -55,7 +55,6 @@ The goal of this project was to create a working miniature desktop display inspi
   - Design the interior to support a RaspberryPi and LCD screen 
 
 ## Final Design
-
 - The computer's outer shell was modeled in Blender from the ground up, closely following reference images from the show to capture the original look.
 - The design was then optimized for 3D printing.
   - The structure was made modular, allowing for easy assembly and disassembly.
@@ -90,8 +89,7 @@ The installation script:
 
 1. Creates a systemd service that automatically starts the application when the Pi boots
 2. Disables screen blanking and screensavers
-3. Hides the mouse cursor
-4. Configures the application to run in full-screen mode
+3. Configures the application to run in full-screen mode
 
 ## Manual Setup (if needed)
 

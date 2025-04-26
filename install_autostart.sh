@@ -34,10 +34,5 @@ if ! grep -q "disable_splash=1" /boot/config.txt; then
     echo "disable_splash=1" | sudo tee -a /boot/config.txt
 fi
 
-# Hide the mouse cursor when inactive
-if ! grep -q "xserver-command=X -nocursor" /etc/lightdm/lightdm.conf; then
-    sudo sed -i 's/^\[Seat:\*\]/[Seat:*]\nxserver-command=X -nocursor/' /etc/lightdm/lightdm.conf
-fi
-
 echo "Setup complete! The Lumon MDR application will now start automatically when the Raspberry Pi boots."
 echo "Please reboot your Raspberry Pi to apply these changes: sudo reboot" 
