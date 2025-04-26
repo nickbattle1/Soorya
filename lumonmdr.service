@@ -1,0 +1,16 @@
+[Unit]
+Description=Lumon MDR Application
+After=graphical.target
+
+[Service]
+Type=simple
+User=pi
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+WorkingDirectory=/home/pi/LumonMDR-main
+ExecStart=/home/pi/LumonMDR-main/LumonMDR --full-screen
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=graphical.target 
