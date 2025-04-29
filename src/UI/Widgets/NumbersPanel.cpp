@@ -443,7 +443,7 @@ private:
     ImFont* font;
 
     ImVec2 panelOffset = ImVec2(0,0);
-    float panelScale = 0.3f;
+    float panelScale = 0.175f;
 
     std::string settingsSavePath = "./settings.json";
     DisplaySettings displaySettings;
@@ -487,8 +487,8 @@ private:
     void drawShutdownMenu(const ImVec2& windowPos, const ImVec2& windowSize) {
         // Make the menu much larger and centered on the screen
         const float menuWidth = windowSize.x * 0.6f;
-        const float menuHeight = windowSize.y * 0.4f;
-        const float buttonHeight = 50.0f;
+        const float menuHeight = windowSize.y * 0.5f;
+        const float buttonHeight = 25.0f;
         const float padding = 20.0f;
         const float logoSize = 80.0f;
         
@@ -514,6 +514,9 @@ private:
                         ImGuiWindowFlags_NoMove | 
                         ImGuiWindowFlags_NoScrollbar |
                         ImGuiWindowFlags_NoSavedSettings)) {
+            
+            // Add font scaling
+            ImGui::SetWindowFontScale(0.5f);
             
             // Style for buttons
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.2f, 0.3f, 1.0f));
