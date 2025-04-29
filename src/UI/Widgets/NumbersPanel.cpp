@@ -443,7 +443,7 @@ private:
     ImFont* font;
 
     ImVec2 panelOffset = ImVec2(0,0);
-    float panelScale = 0.175f;
+    float panelScale = 0.15f;
 
     std::string settingsSavePath = "./settings.json";
     DisplaySettings displaySettings;
@@ -487,10 +487,10 @@ private:
     void drawShutdownMenu(const ImVec2& windowPos, const ImVec2& windowSize) {
         // Make the menu much larger and centered on the screen
         const float menuWidth = windowSize.x * 0.6f;
-        const float menuHeight = windowSize.y * 0.5f;
+        const float menuHeight = windowSize.y * 0.75f;
         const float buttonHeight = 25.0f;
         const float padding = 20.0f;
-        const float logoSize = 80.0f;
+        const float logoSize = 64.0f; // 80 * 0.8 = 64 (20% smaller)
         
         // Add debug output to verify menu dimensions and window size
         std::cout << "Window size: " << windowSize.x << "x" << windowSize.y << ", Menu: " << menuWidth << "x" << menuHeight << std::endl;
@@ -515,8 +515,8 @@ private:
                         ImGuiWindowFlags_NoScrollbar |
                         ImGuiWindowFlags_NoSavedSettings)) {
             
-            // Add font scaling
-            ImGui::SetWindowFontScale(0.5f);
+            // Set custom font size
+            ImGui::SetWindowFontScale(20.0f / 50.0f); // 20.0f relative to the base font size of 50.0f
             
             // Style for buttons
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.2f, 0.3f, 1.0f));
@@ -544,22 +544,37 @@ private:
             // Move buttons down for better spacing
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 20);
             
+            // Calculate text width for centering
+            float shutdownTextWidth = ImGui::CalcTextSize("Shut Down").x;
+            float cancelTextWidth = ImGui::CalcTextSize("Cancel").x;
+            float buttonWidth = menuWidth * 0.7f;
+            
             // Shutdown button - centered and larger
-            ImGui::SetCursorPosX((menuWidth - (menuWidth * 0.7f)) * 0.5f);
-            if (ImGui::Button("Shut Down", ImVec2(menuWidth * 0.7f, buttonHeight))) {
+            ImGui::SetCursorPosX((menuWidth - buttonWidth) * 0.5f);
+            if (ImGui::Button("##shutdownBtn", ImVec2(buttonWidth, buttonHeight))) {
                 // Execute the safe shutdown command with halt flag
                 system("sudo shutdown -h now");
                 showShutdownMenu = false;
             }
             
+            // Center text over the button
+            ImGui::SetCursorPos(ImVec2((menuWidth - shutdownTextWidth) * 0.5f, 
+                                     ImGui::GetCursorPosY() - buttonHeight + (buttonHeight - ImGui::GetTextLineHeight()) * 0.5f));
+            ImGui::Text("Shut Down");
+            
             // Space between buttons
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 20);
             
             // Cancel button - centered and larger
-            ImGui::SetCursorPosX((menuWidth - (menuWidth * 0.7f)) * 0.5f);
-            if (ImGui::Button("Cancel", ImVec2(menuWidth * 0.7f, buttonHeight))) {
+            ImGui::SetCursorPosX((menuWidth - buttonWidth) * 0.5f);
+            if (ImGui::Button("##cancelBtn", ImVec2(buttonWidth, buttonHeight))) {
                 showShutdownMenu = false;
             }
+            
+            // Center text over the button
+            ImGui::SetCursorPos(ImVec2((menuWidth - cancelTextWidth) * 0.5f, 
+                                     ImGui::GetCursorPosY() - buttonHeight + (buttonHeight - ImGui::GetTextLineHeight()) * 0.5f));
+            ImGui::Text("Cancel");
             
             ImGui::PopStyleColor(4); // Pop button and text styles
         }
