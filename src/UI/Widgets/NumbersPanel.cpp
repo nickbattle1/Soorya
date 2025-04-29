@@ -6,7 +6,6 @@
 #include "../UIManager.h"
 
 #include <cmath>
-#include <cstdlib>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <iostream>
@@ -34,6 +33,9 @@ public:
             controlSettings = loadedSettings->controlSettings;
             std::cout << "Successfully loaded settings from disk." << std::endl;
         }
+        
+        // Initialize shutdown menu as closed
+        showShutdownMenu = false;
     }
 
     void init() final
@@ -51,6 +53,9 @@ public:
     void update() final
     {
         numberGrid->update();
+        
+        // We can't directly control idleMode from here as it's managed by UIManager
+        // The idle mode tracking will remain in UIManagerImpl instead
     }
 
     void drawNumbersPanel() final
@@ -75,10 +80,6 @@ public:
         // Draw Bins
         drawBins(windowPos, windowSize, draw_list, numberRefiningToBin);
 
-        // Draw shutdown menu if open
-        if (shutdownMenuOpen) {
-            drawShutdownMenu(windowPos, windowSize);
-        }
     }
 
     void triggerLoadAnimation() final
@@ -266,19 +267,31 @@ private:
         std::string logoPath = "lumon-logo.png";
         auto [widthH, heightH] = imageDisplay->getImageSize(logoPath);
         ImVec2 logoPos = ImVec2(headerBoxMax.x - (widthH*displayPresets.headerImageScale)/2.f, (headerBoxMax.y + headerBoxMin.y)/2.f - (heightH*displayPresets.headerImageScale)/2.f);
-        ImGui::SetCursorPos(logoPos);
+        
+        // Store logo position and size for click detection
+        logoClickArea.x = logoPos.x;
+        logoClickArea.y = logoPos.y;
+        logoClickArea.width = widthH * displayPresets.headerImageScale;
+        logoClickArea.height = heightH * displayPresets.headerImageScale;
+        
+        ImGui::SetCursorPos(ImVec2(logoPos.x - windowPos.x, logoPos.y - windowPos.y));
         imageDisplay->drawImGuiImage(logoPath, displayPresets.headerImageScale, ColorValues::lumonBlue);
         
-        // Check if logo was clicked
-        ImVec2 logoSize = ImVec2(widthH * displayPresets.headerImageScale, heightH * displayPresets.headerImageScale);
-        ImVec2 mousePos = ImGui::GetIO().MousePos;
-        ImVec2 logoMin = ImVec2(ImGui::GetWindowPos().x + logoPos.x, ImGui::GetWindowPos().y + logoPos.y);
-        ImVec2 logoMax = ImVec2(logoMin.x + logoSize.x, logoMin.y + logoSize.y);
+        // Check for logo click
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+            ImVec2 mousePos = ImGui::GetIO().MousePos;
+            if (mousePos.x >= logoClickArea.x && 
+                mousePos.x <= logoClickArea.x + logoClickArea.width && 
+                mousePos.y >= logoClickArea.y && 
+                mousePos.y <= logoClickArea.y + logoClickArea.height) {
+                // Toggle shutdown menu
+                showShutdownMenu = !showShutdownMenu;
+            }
+        }
         
-        if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && 
-            mousePos.x >= logoMin.x && mousePos.x <= logoMax.x && 
-            mousePos.y >= logoMin.y && mousePos.y <= logoMax.y) {
-            shutdownMenuOpen = !shutdownMenuOpen;
+        // Draw shutdown menu if active
+        if (showShutdownMenu) {
+            drawShutdownMenu(windowPos, windowSize);
         }
 
         // Horizontal lines
@@ -293,84 +306,6 @@ private:
         float bottomLineY = windowPos.y + windowSize.y - displayPresets.numberWindowBufferBottom;
         drawLine(bottomLineY);
         drawLine(bottomLineY + displayPresets.lineGraphicsSpacing);
-    }
-    
-    void drawShutdownMenu(const ImVec2& windowPos, const ImVec2& windowSize)
-    {
-        // Set up menu dimensions
-        const float menuWidth = 300.0f;
-        const float menuHeight = 180.0f;
-        const ImVec2 menuPos = ImVec2(
-            windowPos.x + (windowSize.x - menuWidth) * 0.5f,
-            windowPos.y + (windowSize.y - menuHeight) * 0.5f
-        );
-        
-        // Begin menu popup
-        ImGui::SetNextWindowPos(menuPos);
-        ImGui::SetNextWindowSize(ImVec2(menuWidth, menuHeight));
-        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.95f));
-        ImGui::PushStyleColor(ImGuiCol_Border, ColorValues::lumonBlue);
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.05f, 0.05f, 0.05f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.15f, 0.15f, 0.15f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_Text, ColorValues::lumonBlue);
-        
-        if (ImGui::Begin("ShutdownMenu", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar))
-        {
-            // Title
-            ImGui::SetCursorPosY(20);
-            ImGui::SetWindowFontScale(1.2f);
-            const char* title = "System Control";
-            float titleWidth = ImGui::CalcTextSize(title).x;
-            ImGui::SetCursorPosX((menuWidth - titleWidth) * 0.5f);
-            ImGui::Text("%s", title);
-            ImGui::SetWindowFontScale(1.0f);
-            
-            ImGui::Separator();
-            
-            // Shutdown button
-            ImGui::SetCursorPosY(70);
-            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
-            ImGui::PushFont(font);
-            ImGui::SetWindowFontScale(0.5f);
-            const char* shutdownText = "Shut down";
-            float buttonWidth = 200.0f;
-            ImGui::SetCursorPosX((menuWidth - buttonWidth) * 0.5f);
-            
-            if (ImGui::Button(shutdownText, ImVec2(buttonWidth, 40)))
-            {
-                shutdownInProgress = true;
-                ImGui::OpenPopup("ShuttingDownPopup");
-                system("sudo shutdown -h now");
-            }
-            ImGui::PopFont();
-            ImGui::PopStyleVar();
-            
-            // Cancel text (clickable)
-            ImGui::SetCursorPosY(130);
-            const char* cancelText = "Cancel";
-            float cancelWidth = ImGui::CalcTextSize(cancelText).x;
-            ImGui::SetCursorPosX((menuWidth - cancelWidth) * 0.5f);
-            
-            if (ImGui::Button(cancelText, ImVec2(cancelWidth, 20)))
-            {
-                shutdownMenuOpen = false;
-            }
-            
-            // Shutdown in progress popup
-            if (shutdownInProgress)
-            {
-                ImGui::SetNextWindowPos(ImVec2(windowPos.x + windowSize.x * 0.5f, windowPos.y + windowSize.y * 0.5f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-                if (ImGui::BeginPopupModal("ShuttingDownPopup", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
-                {
-                    ImGui::Text("Shutting down...\nPlease wait.");
-                    ImGui::EndPopup();
-                }
-            }
-        }
-        ImGui::End();
-        
-        ImGui::PopStyleColor(6);
     }
 
     bool updateViewport(const ImVec2& windowSize)
@@ -519,12 +454,15 @@ private:
     siv::PerlinNoise perlin{ 555 };
     int t = 0;
 
-    // Shutdown menu state
-    bool shutdownMenuOpen = false;
-    bool shutdownInProgress = false;
-
     // Debug options
     bool revealMap = false;
+
+    // Logo click detection
+    struct ClickableArea {
+        float x, y, width, height;
+    } logoClickArea;
+    
+    bool showShutdownMenu = false;
 
     // TODO - Move to class
     struct Bin
@@ -544,6 +482,104 @@ private:
 
     ImVec2 lastViewportSize = ImVec2(1280, 720);
     float lastGlobalScale = 1.f;
+
+    // Draw shutdown menu
+    void drawShutdownMenu(const ImVec2& windowPos, const ImVec2& windowSize) {
+        // Make the menu much larger and centered on the screen
+        const float menuWidth = windowSize.x * 0.6f;
+        const float menuHeight = windowSize.y * 0.4f;
+        const float buttonHeight = 50.0f;
+        const float padding = 20.0f;
+        const float logoSize = 80.0f;
+        
+        // Add debug output to verify menu dimensions and window size
+        std::cout << "Window size: " << windowSize.x << "x" << windowSize.y << ", Menu: " << menuWidth << "x" << menuHeight << std::endl;
+        
+        // Center menu on screen
+        ImVec2 menuPos = ImVec2(
+            windowPos.x + (windowSize.x - menuWidth) * 0.5f,
+            windowPos.y + (windowSize.y - menuHeight) * 0.5f
+        );
+        
+        // Draw menu background
+        ImGui::SetNextWindowPos(menuPos);
+        ImGui::SetNextWindowSize(ImVec2(menuWidth, menuHeight));
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.12f, 0.15f, 0.95f));
+        ImGui::PushStyleColor(ImGuiCol_Border, ColorValues::lumonBlue.Value);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 2.0f);
+        
+        if (ImGui::Begin("##ShutdownMenu", nullptr, 
+                        ImGuiWindowFlags_NoTitleBar | 
+                        ImGuiWindowFlags_NoResize | 
+                        ImGuiWindowFlags_NoMove | 
+                        ImGuiWindowFlags_NoScrollbar |
+                        ImGuiWindowFlags_NoSavedSettings)) {
+            
+            // Style for buttons
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.2f, 0.3f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.3f, 0.4f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.4f, 0.5f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_Text, ColorValues::lumonBlue.Value);
+            
+            // Center the Lumon logo at the top
+            std::string logoPath = "lumon-logo.png";
+            auto [logoWidth, logoHeight] = imageDisplay->getImageSize(logoPath);
+            float aspectRatio = static_cast<float>(logoWidth) / static_cast<float>(logoHeight);
+            float displayHeight = logoSize;
+            float displayWidth = displayHeight * aspectRatio;
+            
+            ImGui::SetCursorPosX((menuWidth - displayWidth) * 0.5f);
+            ImGui::SetCursorPosY(padding);
+            imageDisplay->drawImGuiImage(logoPath, displayHeight / logoHeight, ColorValues::lumonBlue.Value);
+            
+            // Center-align title text
+            ImGui::SetCursorPosX((menuWidth - ImGui::CalcTextSize("System Options").x) * 0.5f);
+            ImGui::SetCursorPosY(padding + displayHeight + 20);
+            ImGui::Text("System Options");
+            ImGui::Separator();
+            
+            // Move buttons down for better spacing
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 20);
+            
+            // Shutdown button - centered and larger
+            ImGui::SetCursorPosX((menuWidth - (menuWidth * 0.7f)) * 0.5f);
+            if (ImGui::Button("Shut Down", ImVec2(menuWidth * 0.7f, buttonHeight))) {
+                // Execute the safe shutdown command with halt flag
+                system("sudo shutdown -h now");
+                showShutdownMenu = false;
+            }
+            
+            // Space between buttons
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 20);
+            
+            // Cancel button - centered and larger
+            ImGui::SetCursorPosX((menuWidth - (menuWidth * 0.7f)) * 0.5f);
+            if (ImGui::Button("Cancel", ImVec2(menuWidth * 0.7f, buttonHeight))) {
+                showShutdownMenu = false;
+            }
+            
+            ImGui::PopStyleColor(4); // Pop button and text styles
+        }
+        ImGui::End();
+        
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(2); // Pop background and border styles
+        
+        // Also close menu if clicked outside
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+            ImVec2 mousePos = ImGui::GetIO().MousePos;
+            if (!(mousePos.x >= menuPos.x && 
+                mousePos.x <= menuPos.x + menuWidth && 
+                mousePos.y >= menuPos.y && 
+                mousePos.y <= menuPos.y + menuHeight) &&
+                !(mousePos.x >= logoClickArea.x && 
+                mousePos.x <= logoClickArea.x + logoClickArea.width && 
+                mousePos.y >= logoClickArea.y && 
+                mousePos.y <= logoClickArea.y + logoClickArea.height)) {
+                showShutdownMenu = false;
+            }
+        }
+    }
 };
 
 std::shared_ptr<NumbersPanel> createNumbersPanel(const std::shared_ptr<ImageDisplay>& imageDisplay)

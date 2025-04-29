@@ -22,8 +22,12 @@ public:
         imageDisplay = createImageDisplay("./assets/");
         numbersPanel = createNumbersPanel(imageDisplay);
         idleScreen = createIdleScreen(imageDisplay);
-        idleMode = true; // Enable idle mode by default
-        lastActivityTime = ImGui::GetTime();
+        idleTimeoutEnabled = true;
+        idleTimeoutSeconds = 60.0f;
+        timeSinceLastActivity = 0.0f;
+        // Initialize mouse positions to zero - we'll set them properly after ImGui init
+        lastMousePos = ImVec2(0, 0);
+        lastIdleMousePos = ImVec2(0, 0);
     }
 
     void init() final {
@@ -36,6 +40,10 @@ public:
         ImGui_ImplGlfw_InitForOpenGL(glfwGetCurrentContext(), true);
         ImGui_ImplOpenGL3_Init("#version 130");
 
+        // Now that ImGui is initialized, we can safely get the mouse position
+        lastMousePos = ImGui::GetMousePos();
+        lastIdleMousePos = lastMousePos;
+
         numbersPanel->init();
     }
 
@@ -44,43 +52,54 @@ public:
         // Toggle settings mode with 'TAB'
         if (ImGui::IsKeyPressed(ImGuiKey_Tab)) {
             settingsMode = !settingsMode;
+            resetIdleTimer();
         }
 
-        // Manual toggle idle mode with 'I' (for testing purposes)
+        // Toggle idle mode with 'I'
         if (ImGui::IsKeyPressed(ImGuiKey_I)) {
             idleMode = !idleMode;
-            if (!idleMode) {
-                lastActivityTime = ImGui::GetTime();
-                numbersPanel->triggerLoadAnimation();
-            }
-        }
-
-        // Check for user activity (mouse movement or clicks)
-        bool userActivity = false;
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) || 
-            ImGui::IsMouseClicked(ImGuiMouseButton_Right) ||
-            ImGui::IsMouseClicked(ImGuiMouseButton_Middle) ||
-            ImGui::GetIO().MouseDelta.x != 0.0f || 
-            ImGui::GetIO().MouseDelta.y != 0.0f) {
-            userActivity = true;
-        }
-
-        if (userActivity) {
-            lastActivityTime = ImGui::GetTime();
+            resetIdleTimer();
             if (idleMode) {
-                idleMode = false;
-                numbersPanel->triggerLoadAnimation();
+                // Reset the idle mouse position when entering idle mode
+                lastIdleMousePos = ImGui::GetMousePos();
             }
         }
 
-        // Check for inactivity timeout (60 seconds)
-        constexpr float idleTimeoutSeconds = 60.0f;
-        if (!idleMode && (ImGui::GetTime() - lastActivityTime > idleTimeoutSeconds)) {
-            idleMode = true;
+        // Get current mouse position
+        ImVec2 mousePos = ImGui::GetMousePos();
+
+        // Check for mouse movement to reset idle timer
+        if (mousePos.x != lastMousePos.x || mousePos.y != lastMousePos.y) {
+            resetIdleTimer();
+            lastMousePos = mousePos;
+        }
+
+        // Update idle timer and check for timeout
+        if (idleTimeoutEnabled && !idleMode) {
+            timeSinceLastActivity += ImGui::GetIO().DeltaTime;
+            if (timeSinceLastActivity >= idleTimeoutSeconds) {
+                idleMode = true;
+                // Reset the idle mouse position when entering idle mode
+                lastIdleMousePos = mousePos;
+            }
         }
 
         if (idleMode) {
             idleScreen->update();
+
+            // Exit idle mode with 'LEFT CLICK' or ANY MOUSE MOVEMENT
+            // Use the dedicated lastIdleMousePos to accurately detect movement
+            bool mouseHasMoved = (mousePos.x != lastIdleMousePos.x || mousePos.y != lastIdleMousePos.y);
+            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) || mouseHasMoved) {
+                idleMode = false;
+                resetIdleTimer();
+                numbersPanel->triggerLoadAnimation();
+            }
+            
+            // Update the idle mouse position if we didn't exit idle mode
+            if (idleMode) {
+                lastIdleMousePos = mousePos;
+            }
         } else {
             numbersPanel->update();
         }
@@ -125,13 +144,23 @@ public:
     }
 
 private:
+    void resetIdleTimer() {
+        timeSinceLastActivity = 0.0f;
+    }
+
     std::shared_ptr<ImageDisplay> imageDisplay;
     std::shared_ptr<NumbersPanel> numbersPanel;
     std::shared_ptr<IdleScreen> idleScreen;
 
     bool settingsMode = false;
     bool idleMode = false;
-    float lastActivityTime = 0.0f; // Track time of last user activity
+    
+    // Idle timeout settings
+    bool idleTimeoutEnabled;
+    float idleTimeoutSeconds;
+    float timeSinceLastActivity;
+    ImVec2 lastMousePos;         // Used for resetting idle timer
+    ImVec2 lastIdleMousePos;     // Used for detecting movement in idle mode
 };
 
 std::shared_ptr<UIManager> createUIManager()

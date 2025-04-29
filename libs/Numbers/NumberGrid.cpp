@@ -51,7 +51,7 @@ public:
         if (activeBadGroup && !activeGroupStillVisible) {
             activeBadGroup.reset();
             newActiveBadGroup = true;
-            newBadGroupCountdown = randomNumber(5, 15) * 100;
+            newBadGroupCountdown = randomNumber(1, 3) * 25;
         }
 
         // Select a new active group if necessary
@@ -71,7 +71,7 @@ public:
                 } else {
                     if (!badGroup->reachedMax) {
                         if (badGroup->scale < 0.23) {
-                            badGroup->scale += (0.0001 * randomNumber(1, 10));
+                            badGroup->scale += (0.0005 * randomNumber(1, 10));
                         }
                     } else {
                         badGroup->scale -= (0.0001 * randomNumber(1, 10));
@@ -88,7 +88,7 @@ public:
                         badGroup->superActive = false;
                         badGroup->reachedMax = false;
                         activeBadGroup.reset();
-                        newBadGroupCountdown = randomNumber(5, 15) * 100;
+                        newBadGroupCountdown = randomNumber(1, 3) * 25;
                     }
                 }
             } else {
@@ -97,7 +97,7 @@ public:
         }
 
         if (newBadGroupCountdown > 0) {
-            newBadGroupCountdown--;
+            newBadGroupCountdown -= 5;
         }
     }
 
@@ -132,11 +132,11 @@ private:
 
     std::set<int> visibleBadGroups;
     std::optional<int> activeBadGroup = std::nullopt;
-    int newBadGroupCountdown = 500;
+    int newBadGroupCountdown = 50;
 
     siv::PerlinNoise perlinBadNumbers{ 505 };
     float badScale = 0.4f;
-    float badThresh = 0.7f;
+    float badThresh = 0.5f;
     bool newBad = false;
 
     void generateGrid(int size)
