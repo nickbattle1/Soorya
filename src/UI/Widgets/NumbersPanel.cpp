@@ -491,10 +491,10 @@ private:
     void drawShutdownMenu(const ImVec2& windowPos, const ImVec2& windowSize) {
         // Make the menu much larger and centered on the screen
         const float menuWidth = windowSize.x * 0.6f;
-        const float menuHeight = windowSize.y * 0.75f;
+        const float menuHeight = windowSize.y * 0.50f;  // Changed from 0.75f to 0.50f
         const float buttonHeight = 25.0f;
         const float padding = 20.0f;
-        const float logoSize = 64.0f; // 80 * 0.8 = 64 (20% smaller)
+        const float logoSize = 40.0f;  // Changed from 64.0f to 40.0f
         
         // Add debug output to verify menu dimensions and window size
         std::cout << "Window size: " << windowSize.x << "x" << windowSize.y << ", Menu: " << menuWidth << "x" << menuHeight << std::endl;
@@ -520,7 +520,7 @@ private:
                         ImGuiWindowFlags_NoSavedSettings)) {
             
             // Set custom font size
-            ImGui::SetWindowFontScale(20.0f / 50.0f); // 20.0f relative to the base font size of 50.0f
+            ImGui::SetWindowFontScale(18.0f / 50.0f);  // Changed from 20.0f to 18.0f
             
             // Style for buttons
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.2f, 0.3f, 1.0f));
@@ -562,12 +562,12 @@ private:
             }
             
             // Center text over the button
-            ImGui::SetCursorPos(ImVec2((menuWidth - shutdownTextWidth) * 0.5f, 
-                                     ImGui::GetCursorPosY() - buttonHeight + (buttonHeight - ImGui::GetTextLineHeight()) * 0.5f));
+            float textY = ImGui::GetCursorPosY() - buttonHeight + (buttonHeight - ImGui::GetFontSize()) * 0.5f;
+            ImGui::SetCursorPos(ImVec2((menuWidth - shutdownTextWidth) * 0.5f, textY));
             ImGui::Text("Shut Down");
             
-            // Space between buttons
-            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 20);
+            // Space between buttons (reduced from 20 to 8)
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 8);
             
             // Cancel button - centered and larger
             ImGui::SetCursorPosX((menuWidth - buttonWidth) * 0.5f);
@@ -576,8 +576,8 @@ private:
             }
             
             // Center text over the button
-            ImGui::SetCursorPos(ImVec2((menuWidth - cancelTextWidth) * 0.5f, 
-                                     ImGui::GetCursorPosY() - buttonHeight + (buttonHeight - ImGui::GetTextLineHeight()) * 0.5f));
+            textY = ImGui::GetCursorPosY() - buttonHeight + (buttonHeight - ImGui::GetFontSize()) * 0.5f;
+            ImGui::SetCursorPos(ImVec2((menuWidth - cancelTextWidth) * 0.5f, textY));
             ImGui::Text("Cancel");
             
             ImGui::PopStyleColor(4); // Pop button and text styles
