@@ -312,7 +312,17 @@ private:
     {
         static bool viewportInit = false;
         bool viewportChanged = !viewportInit;
-        // Handle arrow key input
+        
+        // Handle mouse wheel for up/down movement
+        float mouseWheel = ImGui::GetIO().MouseWheel;
+        if (mouseWheel != 0.0f) {
+            // Positive wheel = scroll up, negative wheel = scroll down
+            // So we invert the sign to make scrolling feel natural
+            panelOffset.y += controlSettings.arrowSensitivity * mouseWheel;
+            viewportChanged = true;
+        }
+        
+        // Handle left/right arrow key input (keeping these unchanged as requested)
         if (ImGui::IsKeyPressed(ImGuiKey_LeftArrow)) {
             panelOffset.x += controlSettings.arrowSensitivity;
             viewportChanged = true;
@@ -321,13 +331,7 @@ private:
             viewportChanged = true;
         }
 
-        if (ImGui::IsKeyPressed(ImGuiKey_UpArrow)) {
-            panelOffset.y += controlSettings.arrowSensitivity;
-            viewportChanged = true;
-        } else if (ImGui::IsKeyPressed(ImGuiKey_DownArrow)) {
-            panelOffset.y -= controlSettings.arrowSensitivity;
-            viewportChanged = true;
-        }
+        // Remove up/down arrow key handling as we're replacing with mouse wheel
 
         // Handle zoom
         if (ImGui::IsKeyPressed(ImGuiKey_Comma)) {

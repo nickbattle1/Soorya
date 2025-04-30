@@ -55,8 +55,8 @@ public:
             resetIdleTimer();
         }
 
-        // Toggle idle mode with 'I'
-        if (ImGui::IsKeyPressed(ImGuiKey_I)) {
+        // Toggle idle mode with right click instead of 'I' key
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
             idleMode = !idleMode;
             resetIdleTimer();
             if (idleMode) {
