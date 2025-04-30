@@ -491,10 +491,10 @@ private:
     void drawShutdownMenu(const ImVec2& windowPos, const ImVec2& windowSize) {
         // Make the menu much larger and centered on the screen
         const float menuWidth = windowSize.x * 0.6f;
-        const float menuHeight = windowSize.y * 0.70f;  // Changed from 0.50f to 0.70f
+        const float menuHeight = windowSize.y * 0.65f;  // Changed from 0.70f to 0.65f
         const float buttonHeight = 25.0f;
         const float padding = 20.0f;
-        const float logoSize = 40.0f;  // Changed from 64.0f to 40.0f
+        const float logoSize = 40.0f;
         
         // Add debug output to verify menu dimensions and window size
         std::cout << "Window size: " << windowSize.x << "x" << windowSize.y << ", Menu: " << menuWidth << "x" << menuHeight << std::endl;
