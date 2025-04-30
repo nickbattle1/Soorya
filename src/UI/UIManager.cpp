@@ -23,7 +23,7 @@ public:
         numbersPanel = createNumbersPanel(imageDisplay);
         idleScreen = createIdleScreen(imageDisplay);
         idleTimeoutEnabled = true;
-        idleTimeoutSeconds = 60.0f;
+        idleTimeoutSeconds = 300.0f;
         timeSinceLastActivity = 0.0f;
         // Initialize mouse positions to zero - we'll set them properly after ImGui init
         lastMousePos = ImVec2(0, 0);
