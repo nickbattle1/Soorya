@@ -5,11 +5,11 @@ The goal of this project was to create a working miniature desktop display inspi
 ---
 ---
 
-# I. The Software
+# The Software
 
 #### Objectives
 
-  - Generate a randomized **number grid** with grouped 'scary numbers'.  
+  - Generate a randomized **number grid** with grouped 'bad numbers'.  
   - Animate and style the **interface** to match the aesthetics of the show. 
 
 ## a. The Number Grid  
@@ -49,7 +49,7 @@ The goal of this project was to create a working miniature desktop display inspi
 ---
 ---
 
-# II. Hardware Design
+# Hardware Design
 
 #### Objectives
 
@@ -67,7 +67,7 @@ The goal of this project was to create a working miniature desktop display inspi
 ---
 ---
 
-# III. Building and Running the Software
+# Building and Running the Software
 
 Follow these steps to build and run the application on a Raspberry Pi:
 
@@ -112,7 +112,7 @@ cd /path/to/project/build
 ---
 ---
 
-# IV. Controller Configuration
+# Controller Configuration
 
 I used the Logitech G305 mouse due to its onboard memory. I set the key bindings in the G Hub application on Windows, saved the configuration to the mouse onboard memory, and then put the USB receiver into the Raspberry Pi for it to carry over its custom configuration.
 
@@ -121,7 +121,7 @@ I used the Logitech G305 mouse due to its onboard memory. I set the key bindings
 ---
 ---
 
-# V. Final Product
+# Final Product
 
 <table>
   <tr>
@@ -132,12 +132,15 @@ I used the Logitech G305 mouse due to its onboard memory. I set the key bindings
     <td><img src="product-images/3.png" alt="Product Image 3" width="100%"></td>
     <td><img src="product-images/4.png" alt="Product Image 4" width="100%"></td>
   </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="product-images/video.gif" alt="Product Demo Video" width="80%"></td>
+  </tr>
 </table>
 
 ---
 ---
 
-# VI. Setting Up AutoStart
+# Setting Up AutoStart
 
 Follow these steps to configure the application to start automatically when your Raspberry Pi boots up.
 
