@@ -44,7 +44,7 @@ The goal of this project was to create a working miniature desktop display inspi
 - A *'debug mode'* reveals various settings (which can be saved / loaded from disk as JSON).
 - An *'idle mode'* can be enabled to display the Lumon logo screensaver.
 - The user can navigate the full grid using arrow and zoom keys.
-- Clicking on the Lumon logo in the top right corner opens a menu with a safe-shutdown option to safely power down the Raspberry Pi without corrupting the SD card. An inline switch was included to cut power to the Pi after shutdown.
+- Clicking on the Lumon logo in the top right corner opens a menu with a safe-shutdown option to safely power down the Raspberry Pi without corrupting the SD card. I added an inline switch to then cut power to the Pi after shutdown.
 
 ---
 ---
