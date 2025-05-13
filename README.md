@@ -2,8 +2,6 @@
 
 The goal of this project was to create a working miniature desktop display inspired by the 'Macrodata Refinement' computers featured in Apple TV's *Severance*. This build consists of two key aspects: the **software** and the **hardware design**, both outlined below.
 
-Feel free to email comments, suggestions, or inquiries directly to andrewchilx@gmail.com.
-
 ---
 ---
 
@@ -125,12 +123,17 @@ I used the Logitech G305 mouse due to its onboard memory. I set the key bindings
 
 # V. Final Product
 
-| | |
-|:---:|:---:|
-| ![Product Image 1](product-images/1.png) | ![Product Image 2](product-images/2.png) |
-| ![Product Image 3](product-images/3.png) | ![Product Image 4](product-images/4.png) |
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+  <img src="product-images/1.png" alt="Product Image 1">
+  <img src="product-images/2.png" alt="Product Image 2">
+  <img src="product-images/3.png" alt="Product Image 3">
+  <img src="product-images/4.png" alt="Product Image 4">
+</div>
 
-![Video Demo](product-images/5.mp4)
+<video width="100%" controls>
+  <source src="product-images/5.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ---
 ---
