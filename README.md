@@ -9,7 +9,7 @@ The goal of this project was to create a working miniature desktop display inspi
 
 #### Objectives
 
-  - Generate a randomized **number grid** with grouped 'bad numbers'.  
+  - Generate a randomized **number grid** with grouped 'scary numbers'.  
   - Animate and style the **interface** to match the aesthetics of the show. 
 
 ## a. The Number Grid  
