@@ -134,19 +134,6 @@ I used the Logitech G305 mouse due to its onboard memory. I set the key bindings
   </tr>
 </table>
 
-### Video Demo
-
-Option 1: Click the image below to watch the video:
-
-[![Video Demo](product-images/1.png)](product-images/5.mp4)
-
-Option 2: Download and view the [demo video](product-images/5.mp4) directly.
-
-> Note: For best results, consider converting the video to a GIF and embedding it as:
-> ```
-> ![Demo Animation](product-images/demo.gif)
-> ```
-
 ---
 ---
 
