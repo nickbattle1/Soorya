@@ -3,7 +3,6 @@
 The goal of this project was to create a working miniature desktop display inspired by the 'Macrodata Refinement' computers featured in Apple TV's *Severance*. This build consists of two key aspects: the **software** and the **hardware design**, both outlined below.
 
 ---
----
 
 # The Software
 
@@ -47,7 +46,6 @@ The goal of this project was to create a working miniature desktop display inspi
 - Clicking on the Lumon logo in the top right corner opens a menu with a safe-shutdown option to safely power down the Raspberry Pi without corrupting the SD card. I added an inline switch to then cut power to the Pi after shutdown.
 
 ---
----
 
 # Hardware Design
 
@@ -64,7 +62,6 @@ The goal of this project was to create a working miniature desktop display inspi
 - Finally, the interior was equipped with an adjustable Raspberry Pi mount.
   - The mounting bracket can move laterally, and the RPi forward, allowing for fine-tuned alignment of the LCD screen with the front panel.
 
----
 ---
 
 # Building and Running the Software
@@ -110,7 +107,6 @@ cd /path/to/project/build
 ```
 
 ---
----
 
 # Controller Configuration
 
@@ -118,7 +114,6 @@ I used the Logitech G305 mouse due to its onboard memory. I set the key bindings
 
 ![Controller](product-images/controller.png)
 
----
 ---
 
 # Final Product
@@ -137,7 +132,6 @@ I used the Logitech G305 mouse due to its onboard memory. I set the key bindings
   </tr>
 </table>
 
----
 ---
 
 # Setting Up AutoStart
