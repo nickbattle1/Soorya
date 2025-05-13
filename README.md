@@ -133,7 +133,7 @@ I used the Logitech G305 mouse due to its onboard memory. I set the key bindings
     <td><img src="product-images/4.png" alt="Product Image 4" width="100%"></td>
   </tr>
   <tr>
-    <td colspan="2" align="center"><img src="product-images/video.gif" alt="Product Demo Video" width="80%"></td>
+    <td colspan="2" align="center"><img src="product-images/video.gif" alt="Product Demo Video" width="100%"></td>
   </tr>
 </table>
 
